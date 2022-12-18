@@ -11,11 +11,7 @@ class Waves : public Program {
   Waves(CRGBW *leds) {
     for (int i=0;i <N_WAVES; i++) {
       waves[i] = new Wave(leds);
-      waves[i]->setup();
     }
-  }
-
-  void setup() {
   }
 
   void tick() {

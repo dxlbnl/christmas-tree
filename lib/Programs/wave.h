@@ -10,7 +10,6 @@ CHSVPalette16 palette = CHSVPalette16(CHSV(160,255,51), CHSV(0,255,100),  CHSV(1
 
 class Wave : public Program {
   CRGBW *leds;
-  int num_leds;
 
 	int pos = 0;
 	int width = 10;
@@ -21,7 +20,8 @@ class Wave : public Program {
 	public:
   Wave(CRGBW *leds) {
     this->leds = leds;
-    num_leds = sizeof(leds) / sizeof(leds[0]);
+    setup();
+    pos = random8(NUM_LEDS);
   }
 	void setup() {
 		pos = 0;
@@ -32,9 +32,15 @@ class Wave : public Program {
 	}
 
 	void tick() {
-		wave(pos, width, color);
+    float step = M_PI / width;
 
-		if (pos > num_leds) {
+    for (int i=0; i<width; i++) {
+      CHSV c = CHSV(color);
+      c.value = sin(i * step) * 255;
+      leds[i + pos % NUM_LEDS] = c;
+    }
+
+		if (pos > NUM_LEDS) {
 			setup();
 		}
 
@@ -43,15 +49,4 @@ class Wave : public Program {
 		}
 		speed_i = ++speed_i % speed;
 	}
-
-  void wave(int pos, int period, CHSV color) {
-    float step = (float) 255 / period;
-
-    for (int i=0; i<period; i++) {
-      CHSV c = CHSV(color);
-      c.value = sin8(i * step);
-      leds[i + pos % num_leds] = c;
-    }
-  }
-
 };

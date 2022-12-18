@@ -1,11 +1,11 @@
+#define NUM_LEDS      300
 
 #include "FastLED.h"
 
 #include "RGBW.h"
 #include "waves.h"
-// #include "trickle.h"
+#include "trickle.h"
 
-#define NUM_LEDS      300
 #define LED_TYPE   SK6812
 #define DATA_PIN        15
 //#define CLK_PIN       4
@@ -16,7 +16,7 @@ CRGBW leds[NUM_LEDS];
 CRGB *ledsRGB = (CRGB *) &leds[0];
 
 Waves *waves;
-// Trickle *trickle;
+Trickle *trickle;
 
 void setup() {
   delay( 3000 ); //safety startup delay
@@ -25,7 +25,7 @@ void setup() {
     .setCorrection(TypicalLEDStrip);
 
 	waves = new Waves(leds);
-	// trickle = new Trickle(leds);
+	trickle = new Trickle(leds);
 }
 
 
@@ -34,6 +34,7 @@ void loop(){
 	FastLED.clearData();
 
 	waves->tick();
+	trickle->tick();
 
 	FastLED.show();
 }
