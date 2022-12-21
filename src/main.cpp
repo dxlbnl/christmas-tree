@@ -1,10 +1,18 @@
-#define NUM_LEDS      300
+
 
 #include "FastLED.h"
-
 #include "RGBW.h"
+
+#include "wifi.h"
+#include "server.h"
+
+#define NUM_LEDS      300
 #include "waves.h"
 #include "trickle.h"
+#include "redtrickle.h"
+#include "palette.h"
+#include "tree.h"
+#include "twinkle.h"
 
 #define LED_TYPE   SK6812
 #define DATA_PIN        15
@@ -15,26 +23,45 @@
 CRGBW leds[NUM_LEDS];
 CRGB *ledsRGB = (CRGB *) &leds[0];
 
-Waves *waves;
-Trickle *trickle;
+Waves *waves = new Waves(leds);
+Trickle *trickle = new Trickle(leds);
+RedTrickle *redtrickle = new RedTrickle(leds);
+Palette *palette = new Palette(leds);
+Tree *tree = new Tree(leds);
+Twinkle *twinkle = new Twinkle(leds);
 
-void setup() {
-  delay( 3000 ); //safety startup delay
+void ledsSetup() {
+
   FastLED.setMaxPowerInVoltsAndMilliamps( VOLTS, MAX_MA);
   FastLED.addLeds<LED_TYPE, DATA_PIN, RGB>(ledsRGB, getRGBWsize(NUM_LEDS))
     .setCorrection(TypicalLEDStrip);
 
-	waves = new Waves(leds);
-	trickle = new Trickle(leds);
+}
+
+void ledsLoop() {
+	FastLED.clearData();
+
+	tree->tick();
+	redtrickle->tick();
+	twinkle->tick();
+	// trickle->tick();
+
+	FastLED.show();
 }
 
 
+void setup() {
+  delay( 1000 ); //safety startup delay
+	
+	wifiSetup();
+	serverSetup();
+
+	ledsSetup();
+}
 
 void loop(){
-	FastLED.clearData();
+	wifiLoop();
+	serverLoop();
 
-	waves->tick();
-	trickle->tick();
-
-	FastLED.show();
+	ledsLoop();
 }

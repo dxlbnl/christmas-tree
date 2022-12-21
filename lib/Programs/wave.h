@@ -5,17 +5,16 @@
 #include "FastLED.h" 
 #include "RGBW.h"
 
-CHSVPalette16 palette = CHSVPalette16(CHSV(160,255,51), CHSV(0,255,100),  CHSV(120,255,100), CHSV(250,255,51));
-
 
 class Wave : public Program {
   CRGBW *leds;
+  CHSVPalette16 palette = CHSVPalette16(CHSV(0,200,255), CHSV(120,255,100), CHSV(220,255,100));
 
 	int pos = 0;
 	int width = 10;
 	int speed = 10;
 	int speed_i =0;
-	CHSV color = CHSV(0,255,255);
+	int color_i =0;
 
 	public:
   Wave(CRGBW *leds) {
@@ -26,27 +25,25 @@ class Wave : public Program {
 	void setup() {
 		pos = 0;
 		width = random8(10) + 1;
-		color = ColorFromPalette(palette, random8());
-		speed = random8(10) + 1;
-		speed_i = 0;
+		color_i = random8();
+		speed = random8(width) + 1;
+		speed_i = speed;
 	}
 
 	void tick() {
     float step = M_PI / width;
 
     for (int i=0; i<width; i++) {
-      CHSV c = CHSV(color);
-      c.value = sin(i * step) * 255;
-      leds[i + pos % NUM_LEDS] = c;
+      leds[i + pos % NUM_LEDS] = ColorFromPalette(palette, color_i, sin(i * step) * 255);
     }
 
 		if (pos > NUM_LEDS) {
 			setup();
 		}
 
-		if (speed_i == 0) {
+		if (--speed_i == 0) {
 			pos ++;
+			speed_i = speed;
 		}
-		speed_i = ++speed_i % speed;
 	}
 };

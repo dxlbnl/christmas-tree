@@ -2,7 +2,6 @@
 #pragma once
 
 #include "program.h"
-#include "RGBW.h"
 
 float positive(float value) {
 	return value > 0 ? value : 0;
@@ -26,7 +25,7 @@ class Trickle : public Program {
 
       float w3 = sin(i/5 + m/350);
 
-      leds[(int) i].white = positive(w1 + w2) * positive(w3) * 10;
+      leds[(int) i].white = positive(w1 + w2) * positive(w3) * 100;
     }
 
   }
