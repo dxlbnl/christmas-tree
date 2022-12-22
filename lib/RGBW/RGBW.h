@@ -53,3 +53,46 @@ inline uint16_t getRGBWsize(uint16_t nleds){
 	else return nbytes / 3;
 }
 #endif
+
+#include "ArduinoJson.h"
+
+namespace ARDUINOJSON_NAMESPACE {
+template <>
+struct Converter<CRGB> {
+  static bool toJson(const CRGB& src, VariantRef dst) {
+    dst["r"] = src.r;
+    dst["g"] = src.g;
+    dst["b"] = src.b;
+    return true;
+  }
+
+  static CRGB fromJson(VariantConstRef src) {
+    return CRGB(src["r"], src["g"], src["b"]);
+  }
+
+  static bool checkJson(VariantConstRef src) {
+    return src["r"].is<uint8_t>() && src["g"].is<uint8_t>() && src["b"].is<uint8_t>();
+  }
+};
+}
+
+namespace ARDUINOJSON_NAMESPACE {
+template <>
+struct Converter<CHSV> {
+  static bool toJson(const CHSV& src, VariantRef dst) {
+    dst["h"] = src.h;
+    dst["s"] = src.s;
+    dst["v"] = src.v;
+    return true;
+  }
+
+  static CHSV fromJson(VariantConstRef src) {
+    return CHSV(src["h"], src["s"], src["v"]);
+  }
+
+  static bool checkJson(VariantConstRef src) {
+    return src["h"].is<uint8_t>() && src["s"].is<uint8_t>() && src["v"].is<uint8_t>();
+  }
+};
+}
+

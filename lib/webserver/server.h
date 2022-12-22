@@ -15,23 +15,41 @@
 
 #include "redtrickle.h"
 
+
 // SKETCH BEGIN
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
-char *hostName = "esp-lights";
+const char *hostName = "esp-lights";
 
 AsyncCallbackJsonWebHandler* handler = new AsyncCallbackJsonWebHandler("/color", [](AsyncWebServerRequest *request, JsonVariant &json) {
   JsonObject jsonObj = json.as<JsonObject>();
-  JsonObject color = jsonObj["color"];
 
-  const uint8_t r = color["r"];
-  const uint8_t g = color["g"];
-  const uint8_t b = color["b"];
+  if (jsonObj.containsKey("color")) {
+    JsonObject color = jsonObj["color"];
 
-  redtrickle->setColor(CRGB(r, g, b));
+    const uint8_t r = color["r"];
+    const uint8_t g = color["g"];
+    const uint8_t b = color["b"];
 
-  const uint8_t count = jsonObj["count"];
-  twinkle->setCount(count);
+    redtrickle->setColor(CRGB(r, g, b));
+  }
+
+  if (jsonObj.containsKey("count")) {
+    const uint8_t count = jsonObj["count"];
+    twinkle->setCount(count);
+  }
+
+  if (jsonObj.containsKey("tree")) {
+    JsonObject treeData = jsonObj["tree"];
+    tree->config(
+      treeData["color1"],
+      treeData["color2"],
+      treeData["color3"],
+      treeData["speed1"],
+      treeData["speed2"],
+      treeData["speed3"]
+    );
+  }
 
   request->send(200, "application/json", "{test: \"ok\"}");
 });
@@ -68,6 +86,8 @@ void serverSetup(){
   events.onConnect([](AsyncEventSourceClient *client){
     client->send("hello!",NULL,millis(),1000);
   });
+DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Accept, Content-Type");
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
   server.addHandler(&events);
   server.addHandler(handler);
 
@@ -87,9 +107,11 @@ void serverSetup(){
       Serial.printf("PATCH");
     else if(request->method() == HTTP_HEAD)
       Serial.printf("HEAD");
-    else if(request->method() == HTTP_OPTIONS)
+    else if(request->method() == HTTP_OPTIONS) {
       Serial.printf("OPTIONS");
-    else
+      request->send(200);
+      return;
+    } else
       Serial.printf("UNKNOWN");
     Serial.printf(" http://%s%s\n", request->host().c_str(), request->url().c_str());
 

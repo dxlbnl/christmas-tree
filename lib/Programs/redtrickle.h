@@ -18,11 +18,13 @@ class RedTrickle : public Program {
   }
   
   void tick() {
+    if (this->color.red == 0 && this->color.green == 0 && this->color.blue == 0) 
+      return;
 
     for (float i=0; i<NUM_LEDS; i++) {
       float m = millis();
       float w1 = sin(i + m/120);
-      float w2 = sin(i/2 - m/372) ;
+      float w2 = sin(i/2 - m/1372) ;
 
       float w3 = sin(i/5 + m/1709);
 

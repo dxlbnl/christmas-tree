@@ -118,7 +118,6 @@
   #endif
   //////
 
-  #define LED_BUILTIN       2
   #define LED_ON            HIGH
   #define LED_OFF           LOW
 
@@ -709,12 +708,6 @@ void wifiSetup()
   // initialize the LED digital pin as an output.
   pinMode(PIN_LED, OUTPUT);
 
-  Serial.begin(115200);
-
-  while (!Serial);
-
-  delay(200);
-
   Serial.print(F("\nStarting Async_ConfigOnDoubleReset using "));
   Serial.print(FS_Name);
   Serial.print(F(" on "));
@@ -815,7 +808,7 @@ void wifiSetup()
 
   // New from v1.1.1
 #if USING_CORS_FEATURE
-  ESPAsync_wifiManager.setCORSHeader("Your Access-Control-Allow-Origin");
+  ESPAsync_wifiManager.setCORSHeader("localhost");
 #endif
 
   // We can't use WiFi.SSID() in ESP32 as it's only valid after connected.

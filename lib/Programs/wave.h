@@ -20,7 +20,7 @@ class Wave : public Program {
   Wave(CRGBW *leds) {
     this->leds = leds;
     setup();
-    pos = random8(NUM_LEDS);
+    pos = random(NUM_LEDS);
   }
 	void setup() {
 		pos = 0;

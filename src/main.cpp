@@ -4,7 +4,7 @@
 #include "RGBW.h"
 
 #define LED_TYPE   SK6812
-#define DATA_PIN        15
+#define DATA_PIN     13
 //#define CLK_PIN       4
 #define VOLTS          5
 #define MAX_MA       10000
@@ -45,21 +45,41 @@ void ledsSetup() {
 void ledsLoop() {
 	FastLED.clearData();
 
+	// for (int i=0; i<NUM_LEDS; i++) {
+	// 	leds[i] = CRGB::Yellow;
+	// 	delay(10);
+	// 	FastLED.show();
+	// }
+	// delay(100);
+	// for (int i=0; i<NUM_LEDS; i++) {
+	// 	leds[i] = CRGB::Red;
+	// 	delay(10);
+	// }
+	// delay(100);
+
 	tree->tick();
 	redtrickle->tick();
 	twinkle->tick();
 	// trickle->tick();
-
 	FastLED.show();
 }
 
 
 void setup() {
-  delay( 1000 ); //safety startup delay
-	
+  delay( 300 ); //safety startup delay
+
+  Serial.begin(115200);
+  while (!Serial);
+
+  delay(200);
+
+	Serial.println("Setting up wifi");
 	wifiSetup();
+	
+	Serial.println("Setting up server");
 	serverSetup();
 
+	Serial.println("Setting up leds");
 	ledsSetup();
 }
 

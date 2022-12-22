@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "program.h"
@@ -19,7 +18,7 @@ class Point {
   }
   
 };
-#define TWINKLE_POINTS 100
+#define TWINKLE_POINTS 150
 #define TWINKLE_REFRESH_TIME 50
 class Twinkle : public Program {
   CRGBW *leds;
@@ -40,6 +39,7 @@ class Twinkle : public Program {
   }
   
   void tick() {
+    if (!count) return;
 
     EVERY_N_MILLIS(TWINKLE_REFRESH_TIME) {
       points[index++]->reset();
