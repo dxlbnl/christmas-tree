@@ -6,10 +6,15 @@
 
 class RedTrickle : public Program {
   CRGBW *leds;
+  CRGB color = CRGB::Red;
 
   public:
   RedTrickle(CRGBW *leds) {
     this->leds = leds;
+  }
+
+  void setColor(CRGB color) {
+    this->color = color;
   }
   
   void tick() {
@@ -28,10 +33,13 @@ class RedTrickle : public Program {
       // float value = positive(w1 + w2)  * 100;
 
       if (value > 0) {
-        leds[(int) i] = CHSV(0, 220, value);
+        CRGB c = CRGB(this->color).scale8(value);
+        leds[(int) i] = c;
       }
 
     }
 
   }
 };
+
+RedTrickle *redtrickle;

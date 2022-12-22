@@ -19,12 +19,13 @@ class Point {
   }
   
 };
-#define TWINKLE_POINTS 30
+#define TWINKLE_POINTS 100
 #define TWINKLE_REFRESH_TIME 50
 class Twinkle : public Program {
   CRGBW *leds;
   Point *points[TWINKLE_POINTS];
   int index = 0;
+  uint8_t count = 30;
 
   public:
   Twinkle(CRGBW *leds) {
@@ -33,16 +34,20 @@ class Twinkle : public Program {
       points[i] = new Point();
     }
   }
+
+  void setCount(uint8_t c) {
+    count = c;
+  }
   
   void tick() {
 
     EVERY_N_MILLIS(TWINKLE_REFRESH_TIME) {
       points[index++]->reset();
 
-      index %= TWINKLE_POINTS;
+      index %= count;
     }
     
-    for (int i=0; i<TWINKLE_POINTS; i++) {
+    for (int i=0; i<count; i++) {
       Point *point = points[i];
       if (point->value == 255) {
         point->value = random8(100);

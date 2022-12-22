@@ -8,12 +8,33 @@
 #include <ESPAsyncTCP.h>
 #include <ESP8266mDNS.h>
 #endif
+
 #include <ESPAsyncWebServer.h>
+#include "AsyncJson.h"
+#include "ArduinoJson.h"
+
+#include "redtrickle.h"
 
 // SKETCH BEGIN
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
 char *hostName = "esp-lights";
+
+AsyncCallbackJsonWebHandler* handler = new AsyncCallbackJsonWebHandler("/color", [](AsyncWebServerRequest *request, JsonVariant &json) {
+  JsonObject jsonObj = json.as<JsonObject>();
+  JsonObject color = jsonObj["color"];
+
+  const uint8_t r = color["r"];
+  const uint8_t g = color["g"];
+  const uint8_t b = color["b"];
+
+  redtrickle->setColor(CRGB(r, g, b));
+
+  const uint8_t count = jsonObj["count"];
+  twinkle->setCount(count);
+
+  request->send(200, "application/json", "{test: \"ok\"}");
+});
 
 void serverSetup(){
 
@@ -48,8 +69,9 @@ void serverSetup(){
     client->send("hello!",NULL,millis(),1000);
   });
   server.addHandler(&events);
+  server.addHandler(handler);
 
-  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
+  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
 
   server.onNotFound([](AsyncWebServerRequest *request){
     Serial.printf("NOT_FOUND: ");
@@ -102,5 +124,4 @@ void serverSetup(){
 
 void serverLoop(){
   ArduinoOTA.handle();
-  ws.cleanupClients();
 }

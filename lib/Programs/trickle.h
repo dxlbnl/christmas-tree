@@ -3,11 +3,6 @@
 
 #include "program.h"
 
-float positive(float value) {
-	return value > 0 ? value : 0;
-}
-
-
 class Trickle : public Program {
   CRGBW *leds;
 

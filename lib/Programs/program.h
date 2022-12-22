@@ -7,3 +7,10 @@ class Program {
 
   virtual void tick();
 };
+
+
+
+float positive(float value) {
+	return value > 0 ? value : 0;
+}
+
