@@ -4,12 +4,7 @@
 #include "program.h"
 
 class Trickle : public Program {
-  CRGBW *leds;
-
   public:
-  Trickle(CRGBW *leds) {
-    this->leds = leds;
-  }
   
   void tick() {
 

@@ -13,8 +13,6 @@
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
 
-#include "redtrickle.h"
-
 
 // SKETCH BEGIN
 AsyncWebServer server(80);
@@ -24,31 +22,16 @@ const char *hostName = "esp-lights";
 AsyncCallbackJsonWebHandler* handler = new AsyncCallbackJsonWebHandler("/color", [](AsyncWebServerRequest *request, JsonVariant &json) {
   JsonObject jsonObj = json.as<JsonObject>();
 
-  if (jsonObj.containsKey("color")) {
-    JsonObject color = jsonObj["color"];
-
-    const uint8_t r = color["r"];
-    const uint8_t g = color["g"];
-    const uint8_t b = color["b"];
-
-    redtrickle->setColor(CRGB(r, g, b));
+  if (jsonObj.containsKey("trickle")) {
+    scene->get("trickle")->config(jsonObj["trickle"]);
   }
 
-  if (jsonObj.containsKey("count")) {
-    const uint8_t count = jsonObj["count"];
-    twinkle->setCount(count);
+  if (jsonObj.containsKey("twinkle")) {
+    scene->get("twinkle")->config(jsonObj["twinkle"]);
   }
 
   if (jsonObj.containsKey("tree")) {
-    JsonObject treeData = jsonObj["tree"];
-    tree->config(
-      treeData["color1"],
-      treeData["color2"],
-      treeData["color3"],
-      treeData["speed1"],
-      treeData["speed2"],
-      treeData["speed3"]
-    );
+    scene->get("tree")->config(jsonObj["tree"]);
   }
 
   request->send(200, "application/json", "{test: \"ok\"}");

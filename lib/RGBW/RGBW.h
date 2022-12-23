@@ -59,11 +59,10 @@ inline uint16_t getRGBWsize(uint16_t nleds){
 namespace ARDUINOJSON_NAMESPACE {
 template <>
 struct Converter<CRGB> {
-  static bool toJson(const CRGB& src, VariantRef dst) {
+  static void toJson(const CRGB& src, VariantRef dst) {
     dst["r"] = src.r;
     dst["g"] = src.g;
     dst["b"] = src.b;
-    return true;
   }
 
   static CRGB fromJson(VariantConstRef src) {

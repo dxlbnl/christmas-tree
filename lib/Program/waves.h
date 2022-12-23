@@ -8,7 +8,7 @@ class Waves : public Program {
   Wave *waves[N_WAVES];
 
   public:
-  Waves(CRGBW *leds) {
+  Waves() {
     for (int i=0;i <N_WAVES; i++) {
       waves[i] = new Wave(leds);
     }

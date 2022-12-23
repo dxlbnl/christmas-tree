@@ -1,39 +1,6 @@
 <script lang="ts">
   import ColorPicker from 'svelte-awesome-color-picker';
   import type { RgbaColor, HsvaColor } from 'svelte-awesome-color-picker'
-  import { browser } from '$app/environment';
-
-
-  let rgb : RgbaColor
-  let count: number = 20
-
-  const debounced = (func: (...args: any[]) => any, timeout: number) => {
-    let isCalled = false
-    let lastArgs: any[] | null
-    let timer: NodeJS.Timeout
-
-    let timeoutcb = () => {
-      if (lastArgs) {
-        func.call(lastArgs)
-        lastArgs = null
-        isCalled = false
-        timer = setTimeout(timeoutcb, timeout)
-      }
-    }
-
-    return (...args: any[]) => {
-      if (isCalled) {
-        lastArgs = args
-      } else {
-        func.call(args)
-        isCalled = true
-
-        timer = setTimeout(timeoutcb, timeout)
-      }
-    }
-  }
-
-
   type RGBColor = {
       r: number;
       g: number;
@@ -45,8 +12,12 @@
       v: number;
   }
   interface Data {
-    color?: RGBColor,
-    count?: number;
+    trickle?: {
+      color?: RGBColor,
+    },
+    twinkle?: {
+      count?: number;
+    },
     tree?: {
       color1: HSVColor;
       color2: HSVColor;
@@ -57,12 +28,25 @@
     }
   }
 
+  let timer: NodeJS.Timeout | null;
+  let cachedData: Data | null
   const send = async (data: Data) => {
-    fetch("http://esp-lights.local/color", {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'content-type': 'application/json'
-    }}) 
+    if (timer) {
+      cachedData = {...cachedData, ...data}
+    } else {
+      fetch("http://esp-lights.local/color", {
+        method: 'POST',
+        body: JSON.stringify({...cachedData, ...data}),
+        headers: { 'content-type': 'application/json'
+      }})
+      cachedData = null;
+      timer = setTimeout(() => {
+        timer = null;
+        if (cachedData) {
+          send(cachedData)
+        }
+      }, 100)
+    }
   }
 
   // $: browser && send(rgb, count)
@@ -92,9 +76,9 @@
 
 <h1>Lights</h1>
 
-<ColorPicker isInput={false} on:input={(e) => send({ color: e.detail.rgb })}  />
+<ColorPicker isInput={false} on:input={(e) => send({ trickle: {color: e.detail.rgb } })}  />
 
-<input type='range' min={0} max={150} on:input={(e) => send({ count: e.target.valueAsNumber})} />
+<input type='range' min={0} max={150} on:input={(e) => send({ twinkle: { count: e.target.valueAsNumber }})} />
 
 <section>
   <section class='row'>

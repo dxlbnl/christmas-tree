@@ -21,21 +21,28 @@ class Point {
 #define TWINKLE_POINTS 150
 #define TWINKLE_REFRESH_TIME 50
 class Twinkle : public Program {
-  CRGBW *leds;
   Point *points[TWINKLE_POINTS];
   int index = 0;
   uint8_t count = 30;
 
   public:
-  Twinkle(CRGBW *leds) {
-    this->leds = leds;
+  Twinkle() {
     for (int i=0; i<TWINKLE_POINTS; i++) {
       points[i] = new Point();
     }
   }
+  Twinkle(VariantConstRef src) {
+    this->count = src["count"];
+  }
+  bool checkJson(VariantConstRef src) {
+    return src["count"].is<uint8_t>();
+  }
 
-  void setCount(uint8_t c) {
-    count = c;
+  void config(JsonObject data) {
+    this->count = data["count"];
+  }
+  void toJson(VariantRef dst) {
+    dst["count"] = this->count;
   }
   
   void tick() {
