@@ -52,7 +52,7 @@
   })
 
   onMount(async () => {
-    const req = await fetch('http://esp-lights.local/config.json')
+    const req = await fetch('/config.json')
 
     const data: Data = await req.json()
 
@@ -81,7 +81,7 @@
     if (timer) {
       cachedData = {...cachedData, ...data}
     } else {
-      fetch("http://esp-lights.local/color", {
+      fetch("/color", {
         method: 'POST',
         body: JSON.stringify({...cachedData, ...data}),
         headers: { 'content-type': 'application/json'

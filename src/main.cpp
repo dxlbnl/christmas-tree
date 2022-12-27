@@ -28,6 +28,8 @@ void ledsSetup() {
   FastLED.setMaxPowerInVoltsAndMilliamps( VOLTS, MAX_MA);
   FastLED.addLeds<LED_TYPE, DATA_PIN, RGB>(ledsRGB, getRGBWsize(NUM_LEDS))
     .setCorrection(TypicalLEDStrip);
+
+	scene->setup();
 }
 
 void ledsLoop() {

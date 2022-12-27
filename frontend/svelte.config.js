@@ -8,7 +8,7 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter({  precompress: true, pages: '../data' })
+		adapter: adapter({ pages: '../data' })
 	}
 };
 
