@@ -4,7 +4,6 @@
 
 #include "program.h"
 
-
 #include "waves.h"
 #include "trickle.h"
 #include "redtrickle.h"
@@ -14,6 +13,7 @@
 
 class Scene {
   std::map<std::string, Program*> programs;
+  boolean shouldSave = false;
 
   public:
     Scene(std::map<std::string, Program*> programs) {
@@ -22,11 +22,56 @@ class Scene {
     void add(std::string name, Program *program) {
       programs[name] = program;
     }
+    void setConfig(JsonObject data) {
+      for (JsonPair kv: data) {
+        std::string name = kv.key().c_str();
+        if (this->programs.find(name) != this->programs.end()) {
+          this->programs[name]->setConfig(kv.value());
+        }
+      }
+      shouldSave = true;
+    }
+    void getConfig( DynamicJsonDocument &config) {
+
+      for(auto &[name, program]: programs) {
+        JsonObject obj = config.createNestedObject(name.c_str());
+        program->getConfig(obj);
+      }
+    }
+    void storeConfig(const char *filename) {
+      DynamicJsonDocument config(2048);
+
+      config["testing"] = true;
+
+      getConfig(config);
+
+      // Open file for writing
+      File file = FileFS.open(filename, "w");
+
+      if (!file) {
+        Serial.println("Failed to open config file for writing");
+        return;
+      }
+      // Serialize JSON to file
+      if (serializeJson(config, file) == 0) {
+        Serial.println(F("Failed to write to file"));
+      }
+
+      // Close the file
+      file.close();
+    }
+    void loadConfig() {}
     Program* get(std::string name) {
       return programs[name];
     }
      
     void tick() {
+      EVERY_N_SECONDS(1) {
+        if (shouldSave) {
+          storeConfig("/config.json");
+          shouldSave = false;
+        }
+      }
       FastLED.clearData();
 
       for(auto &[name, program]: programs) {

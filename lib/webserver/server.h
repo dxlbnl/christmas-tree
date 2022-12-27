@@ -22,18 +22,7 @@ const char *hostName = "esp-lights";
 AsyncCallbackJsonWebHandler* handler = new AsyncCallbackJsonWebHandler("/color", [](AsyncWebServerRequest *request, JsonVariant &json) {
   JsonObject jsonObj = json.as<JsonObject>();
 
-  if (jsonObj.containsKey("trickle")) {
-    scene->get("trickle")->config(jsonObj["trickle"]);
-  }
-
-  if (jsonObj.containsKey("twinkle")) {
-    scene->get("twinkle")->config(jsonObj["twinkle"]);
-  }
-
-  if (jsonObj.containsKey("tree")) {
-    scene->get("tree")->config(jsonObj["tree"]);
-  }
-
+  scene->setConfig(jsonObj);
   request->send(200, "application/json", "{test: \"ok\"}");
 });
 

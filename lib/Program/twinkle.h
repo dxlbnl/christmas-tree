@@ -31,18 +31,12 @@ class Twinkle : public Program {
       points[i] = new Point();
     }
   }
-  Twinkle(VariantConstRef src) {
-    this->count = src["count"];
-  }
-  bool checkJson(VariantConstRef src) {
-    return src["count"].is<uint8_t>();
-  }
 
-  void config(JsonObject data) {
+  void setConfig(JsonObject data) {
     this->count = data["count"];
   }
-  void toJson(VariantRef dst) {
-    dst["count"] = this->count;
+  void getConfig(JsonObject data) {
+    data["count"] = this->count;
   }
   
   void tick() {

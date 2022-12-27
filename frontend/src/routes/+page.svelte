@@ -1,11 +1,9 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import ColorPicker from 'svelte-awesome-color-picker';
   import type { RgbaColor, HsvaColor } from 'svelte-awesome-color-picker'
-  type RGBColor = {
-      r: number;
-      g: number;
-      b: number;
-  }
+
+  
   type HSVColor = {
       h: number;
       s: number;
@@ -13,7 +11,7 @@
   }
   interface Data {
     trickle?: {
-      color?: RGBColor,
+      color?: RgbaColor,
     },
     twinkle?: {
       count?: number;
@@ -30,6 +28,55 @@
 
   let timer: NodeJS.Timeout | null;
   let cachedData: Data | null
+  let loaded = false;
+
+  let color1: HsvaColor = {h: 0, s: 100, v: 100, a: 0}
+  let color2: HsvaColor = {h: 0, s: 100, v: 100, a: 0}
+  let color3: HsvaColor = {h: 0, s: 100, v: 100, a: 0}
+  let speed1 = 1230
+  let speed2 = 136
+  let speed3 = 500
+  let trickle = { color: {r:0, g: 0, b: 0, a:0}}
+  let twinkle = { count: 10 }
+
+  const convertToHSV = (c: HsvaColor): HSVColor => ({
+    h: c.h/360 * 255 |0,
+    s: c.s/100 * 255 |0,
+    v: c.v/100 * 255 |0,
+  })
+  const convertFromHSV = (c: HSVColor): HsvaColor => ({
+    h: c.h/255 * 360 |0,
+    s: c.s/255 * 100 |0,
+    v: c.v/255 * 100 |0,
+    a: 1
+  })
+
+  onMount(async () => {
+    const req = await fetch('http://esp-lights.local/config.json')
+
+    const data: Data = await req.json()
+
+    if (data.tree) {
+      color1 = convertFromHSV(data.tree.color1)
+      color2 = convertFromHSV(data.tree.color2)
+      color3 = convertFromHSV(data.tree.color3)
+      speed1 = data.tree.speed1
+      speed2 = data.tree.speed2
+      speed3 = data.tree.speed3
+    }
+
+    if (data.trickle?.color) {
+      trickle.color = data.trickle.color
+    }
+
+    if (data.twinkle?.count) {
+      twinkle.count = data.twinkle.count
+    }
+
+    loaded = true;
+  })
+
+
   const send = async (data: Data) => {
     if (timer) {
       cachedData = {...cachedData, ...data}
@@ -49,48 +96,42 @@
     }
   }
 
-  // $: browser && send(rgb, count)
-
-  let color1: HsvaColor = {h: 0, s: 100, v: 100, a: 0}
-  let color2: HsvaColor = {h: 0, s: 100, v: 100, a: 0}
-  let color3: HsvaColor = {h: 0, s: 100, v: 100, a: 0}
-  let speed1 = 1230
-  let speed2 = 136
-  let speed3 = 500
-  const convertHSV = (c: HsvaColor): HSVColor => ({
-    h: c.h/360 * 255 |0,
-    s: c.s/100 * 255 |0,
-    v: c.v/100 * 255 |0,
-  })
-  $: send({
+  $: loaded && send({
     tree: {
-      color1: convertHSV(color1),
-      color2: convertHSV(color2),
-      color3: convertHSV(color3),
+      color1: convertToHSV(color1),
+      color2: convertToHSV(color2),
+      color3: convertToHSV(color3),
       speed1,
       speed2,
       speed3,
     }
   })
+  $: loaded && send({ twinkle })
+  $: loaded && send({ trickle })
 </script>
 
 <h1>Lights</h1>
 
-<ColorPicker isInput={false} on:input={(e) => send({ trickle: {color: e.detail.rgb } })}  />
+{#if !loaded}
+  <p>Loading...</p>
+{:else}
+  <ColorPicker isInput={false} bind:rgb={trickle.color} />
 
-<input type='range' min={0} max={150} on:input={(e) => send({ twinkle: { count: e.target.valueAsNumber }})} />
+  <input type='range' min={0} max={150} bind:value={twinkle.count} />
 
-<section>
-  <section class='row'>
-    <ColorPicker isInput={false} bind:hsv={color1}/>
-    <ColorPicker isInput={false} bind:hsv={color2}/>
-    <ColorPicker isInput={false} bind:hsv={color3}/>
-  </section>
+  <section>
+    <section class='row'>
+      <ColorPicker isInput={false} bind:hsv={color1}/>
+      <ColorPicker isInput={false} bind:hsv={color2}/>
+      <ColorPicker isInput={false} bind:hsv={color3}/>
+    </section>
+
     <input type='range' min={100} max={3000} bind:value={speed1}/>
     <input type='range' min={100} max={3000} bind:value={speed2}/>
     <input type='range' min={100} max={3000} bind:value={speed3}/>
 
-</section>
+  </section>
+{/if}
 
 <style>
   .row {

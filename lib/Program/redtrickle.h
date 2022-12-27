@@ -8,18 +8,12 @@ class RedTrickle : public Program {
   CRGB color = CRGB::Red;
 
   public:
-  void config(JsonObject data) {
+  void setConfig(JsonObject data) {
     CRGB c = data["color"];
     this->color = c;
   }
-  void toJson(VariantRef dst) {
-    dst["color"] = this->color;
-  }
-  RedTrickle(VariantConstRef src) {
-    this->color = src["color"];
-  }
-  bool checkJson(VariantConstRef src) {
-    return src["color"].is<CRGB>();
+  void getConfig(JsonObject config) {
+    config["color"] = this->color;
   }
   
   void tick() override {
