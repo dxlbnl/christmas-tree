@@ -1,9 +1,9 @@
+#include "map"
 #include "FastLED.h"
 #include "RGBW.h"
 
 #define LED_TYPE   SK6812
 #define DATA_PIN     13
-//#define CLK_PIN       4
 #define VOLTS          5
 #define MAX_MA       10000
 #define NUM_LEDS      300
@@ -13,6 +13,7 @@ static CRGB *ledsRGB = (CRGB *) &leds[0];
 
 #include "wifi.h"
 #include "scene.h"
+#include "Cyclon.h"
 #include "webserver.h"
 
 class MainPrograms : public MainControl {
@@ -27,8 +28,8 @@ public:
 				{"trickle", new RedTrickle()},
 				{"twinkle", new Twinkle()},
 			});
-
-        this->setCurrentProgram("Wavy");
+        programs["Cyclon"] = new Cyclon();
+        this->setCurrentProgram("Cyclon");
     }
 
     bool setCurrentProgram(const std::string& name) override
@@ -67,8 +68,8 @@ LightServer webserver(&programs);
 
 void ledsSetup() {
   FastLED.setMaxPowerInVoltsAndMilliamps( VOLTS, MAX_MA);
-  FastLED.addLeds<LED_TYPE, DATA_PIN, RGB>(ledsRGB, getRGBWsize(NUM_LEDS))
-    .setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN, RGB>(ledsRGB, getRGBWsize(NUM_LEDS));
+    // .setCorrection(TypicalLEDStrip);
 }
 
 void setup() {

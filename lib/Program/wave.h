@@ -7,7 +7,6 @@
 
 
 class Wave : public Program {
-  CRGBW *leds;
   CHSVPalette16 palette = CHSVPalette16(CHSV(0,200,255), CHSV(120,255,100), CHSV(220,255,100));
 
 	int pos = 0;
@@ -17,8 +16,7 @@ class Wave : public Program {
 	int color_i =0;
 
 	public:
-  Wave(CRGBW *leds) {
-    this->leds = leds;
+  Wave() {
     setup();
     pos = random(NUM_LEDS);
   }

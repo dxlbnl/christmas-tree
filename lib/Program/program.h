@@ -1,14 +1,10 @@
 #pragma once
 
-#include "FastLED.h"
 #include "ArduinoJson.h"
-#include "AsyncJson.h"
-#include "RGBW.h"
 
 class Program {
   public:
-
-  virtual void tick();
+  virtual void tick() = 0;
   virtual void setConfig(JsonObject);
   virtual void getConfig(JsonObject);
   

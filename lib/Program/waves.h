@@ -10,7 +10,7 @@ class Waves : public Program {
   public:
   Waves() {
     for (int i=0;i <N_WAVES; i++) {
-      waves[i] = new Wave(leds);
+      waves[i] = new Wave();
     }
   }
 
