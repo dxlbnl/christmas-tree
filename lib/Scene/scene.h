@@ -11,13 +11,15 @@
 #include "tree.h"
 #include "twinkle.h"
 
-class Scene {
+class Scene: public Program {
   std::map<std::string, Program*> programs;
   boolean shouldSave = false;
 
   public:
     Scene(std::map<std::string, Program*> programs) {
       this->programs = programs;
+
+      this->setup();
     }
     void add(std::string name, Program *program) {
       programs[name] = program;
@@ -32,7 +34,7 @@ class Scene {
       }
       shouldSave = true;
     }
-    void getConfig( DynamicJsonDocument &config) {
+    void getConfig(JsonObject config) {
 
       for(auto &[name, program]: programs) {
         JsonObject obj = config.createNestedObject(name.c_str());
@@ -42,7 +44,7 @@ class Scene {
     void storeConfig(const char *filename) {
       DynamicJsonDocument config(2048);
 
-      getConfig(config);
+      getConfig(config.as<JsonObject>());
 
       // Open file for writing
       File file = FileFS.open(filename, "w");

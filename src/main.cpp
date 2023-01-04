@@ -1,5 +1,3 @@
-
-
 #include "FastLED.h"
 #include "RGBW.h"
 
@@ -10,30 +8,67 @@
 #define MAX_MA       10000
 #define NUM_LEDS      300
 
-
 static CRGBW leds[NUM_LEDS];
 static CRGB *ledsRGB = (CRGB *) &leds[0];
 
 #include "wifi.h"
 #include "scene.h"
+#include "webserver.h"
 
-Scene *scene = new Scene({
-	{"tree", new Tree()},
-	{"trickle", new RedTrickle()},
-	{"twinkle", new Twinkle()},
-});
-#include "server.h"
+class MainPrograms : public MainControl {
+    std::map<std::string, Program*> programs;
+    Program *cur;
+public:
+    MainPrograms()
+        : cur(nullptr)
+    {
+			programs["Wavy"] = new Scene({
+				{"tree", new Tree()},
+				{"trickle", new RedTrickle()},
+				{"twinkle", new Twinkle()},
+			});
+
+        this->setCurrentProgram("Wavy");
+    }
+
+    bool setCurrentProgram(const std::string& name) override
+    {
+        auto i = programs.find(name);
+        if (i == programs.end())
+            return false;
+
+        cur = i->second;
+        return true;
+    }
+    std::vector<std::string> getPrograms() override
+    {
+        std::vector<std::string> v;
+        for (auto kv : programs)
+            v.emplace_back(kv.first);
+        return v;
+    }
+
+    Program* current()
+    {
+        return cur;
+    }
+
+    void loop()
+    {
+        if (cur) {
+            cur->tick();
+            FastLED.show();
+        }
+    }
+};
+
+MainPrograms programs;
+LightServer webserver(&programs);
 
 void ledsSetup() {
   FastLED.setMaxPowerInVoltsAndMilliamps( VOLTS, MAX_MA);
   FastLED.addLeds<LED_TYPE, DATA_PIN, RGB>(ledsRGB, getRGBWsize(NUM_LEDS))
     .setCorrection(TypicalLEDStrip);
-
-	scene->setup();
-}
-
-void ledsLoop() {
-	scene->tick();
 }
 
 void setup() {
@@ -48,15 +83,18 @@ void setup() {
 	wifiSetup();
 	
 	Serial.println("Setting up server");
-	serverSetup();
+	webserver.setup();
 
 	Serial.println("Setting up leds");
 	ledsSetup();
+
+	programs.setCurrentProgram("Christmas");
 }
+
 
 void loop(){
 	wifiLoop();
-	serverLoop();
+	webserver.loop();
 
-	ledsLoop();
+	programs.loop();
 }
