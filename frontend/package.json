@@ -32,6 +32,7 @@
 		"@sveltejs/adapter-static": "^1.0.0",
 		"colord": "^2.9.3",
 		"svelte-awesome-color-picker": "^2.2.1",
-		"svelte-color-picker": "^1.0.7"
+		"svelte-color-picker": "^1.0.7",
+		"svelte-dnd-action": "^0.9.22"
 	}
 }

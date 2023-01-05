@@ -16,6 +16,7 @@
 
 class MainControl {
 public:
+    virtual const std::string getCurrentProgram() = 0;
     virtual bool setCurrentProgram(const std::string& name) = 0;
     virtual Program* current() = 0;
     virtual std::vector<std::string> getPrograms() = 0;
@@ -99,6 +100,19 @@ public:
           FastLED.setBrightness(brightness);
         }
         request->send(200, "text/plain", "Ok");
+      });
+
+      // Send a POST request to <IP>/program to set the program
+      server.on("/config", HTTP_GET, [this](AsyncWebServerRequest *request){
+        AsyncResponseStream *response = request->beginResponseStream("application/json");
+        DynamicJsonDocument json(50);
+
+        json["program"] = main->getCurrentProgram();
+        json["brightness"] = FastLED.getBrightness();
+        
+        serializeJson(json, *response);
+        response->setCode(200);
+        request->send(response);
       });
 
       server.on("/program", HTTP_GET, [this](AsyncWebServerRequest *request){

@@ -1,0 +1,16 @@
+
+
+:root {
+  --hue: 69;
+
+  --color: hsl(var(--hue), 91%, 90%);
+  --background-color: hsl(calc(var(--hue) + 120), 91%, 13%);
+  --button-color: hsl(calc(var(--hue) + 120), 91%, 10%);
+  --border: 2px solid hsl(calc(var(--hue) + 120), 91%, 19%);
+
+  --margin: .5rem;
+  
+  background-color: var(--background-color);
+  color: var(--color);
+  font-family: sans-serif;
+}

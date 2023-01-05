@@ -4,6 +4,9 @@
   import type { PageData } from './$types';
 
   export let data: PageData;
+
+  const programChange = ({ target }: Event) => config({ program: (target as HTMLSelectElement).value })
+  const brightnessChange = ({ target }: Event) => config({ brightness: (target as HTMLInputElement).valueAsNumber })
 </script>
 
 <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -11,15 +14,15 @@
   Program:
   <Select
     options={data.programs}
-    on:change={({ target }) => config({ program: target.value })}
+    bind:value={data.config.program}
+    on:change={e => programChange(e)}
   />
 </label>
 
 <label>
   Brightness:
-  <input type='range' min=1 max=255 on:change={({ target }) => config({ brightness: target.value })} />
+  <input bind:value={data.config.brightness} type='range' min=1 max=255 on:change={brightnessChange} />
 </label>
-
 
 <style>
   label {

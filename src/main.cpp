@@ -41,6 +41,14 @@ public:
         cur = i->second;
         return true;
     }
+    const std::string getCurrentProgram()
+    {
+        for (auto &i: programs) {
+            if (i.second == cur) {
+                return i.first;
+            }
+        }
+    }
     std::vector<std::string> getPrograms() override
     {
         std::vector<std::string> v;

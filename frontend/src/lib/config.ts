@@ -1,6 +1,6 @@
 type Config = {
-  brightness: number;
-  program: string;
+  brightness?: number;
+  program?: string;
 }
 
 export const config = (config: Config) =>
